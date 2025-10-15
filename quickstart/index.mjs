@@ -7,8 +7,17 @@ const socket = await ModelSocket.connect("wss://models.mixlayer.ai/ws");
 // open a llama 8b sequence
 const seq = await socket.open("meta/llama3.1-8b-instruct-free");
 
-// prompt the model
-seq.append("What's the meaning of life?\n", { role: "user" });
+// prompt for input
+process.stderr.write("Enter your message (Ctrl+D to finish):\n");
+
+// read input from stdin until EOF
+let input = '';
+for await (const chunk of process.stdin) {
+  input += chunk;
+}
+
+// prompt the model with the input
+seq.append(input, { role: "user" });
 
 // produce a response
 const stream = seq.gen({ role: "assistant" }).stream();
